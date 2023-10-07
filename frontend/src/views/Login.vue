@@ -6,16 +6,26 @@
                 <h1 class="title"> Login
                 </h1>
                 <form @submit.prevent="submitForm">
+                    <div
+                class="notification is-danger"
+            
+                v-if="errorMsg != ''"
+              >
+                {{ errorMsg }}
+              </div>
                  
                     
                     <div class="field">
-                        {{errors.length }}
-                        {{ errors }}
-                
                         <label>Email</label>
                         <div class="control">
                             <input type="email" name="email" class="input" v-model="email"/>
                         </div>
+                        <div class="notification is-danger" v-if="errors['email']">
+                           
+                           <p> {{ errors["email"] }}</p>
+                          
+   
+                       </div>
                         
                    
                     </div>
@@ -28,9 +38,15 @@
                         </div>
                       
                     </div>
-                    <div class="notification is-danger" v-if="errors.length">
+                    <!-- <span
+                  v-if="errors['username'] && username == ''"
+                  class="text-danger"
+                >
+                  {{ errors["username"] }}
+                </span> -->
+                    <div class="notification is-danger" v-if="errors['password']">
                            
-                        <p>{{ errors }}</p>
+                        <p> {{ errors["password"] }}</p>
                        
 
                     </div>
@@ -58,11 +74,25 @@ export default {
         return {
             email :"",
             password:"",
-            errors:[]
+            errors:[],
+            errorMsg:''
         }
     },
     methods:{
         submitForm(){
+            this.errors = [];
+      this.errorMsg = "";
+      if (this.password == "" || this.email == "") {
+        if (this.password == "" && this.email == "") {
+          this.errors.password = "This field is required";
+          this.errors.email = "This field is required";
+        } else if (this.email == "") {
+          this.errors.email = "This field is required";
+        } else if (this.password == "") {
+          this.errors.password = "This field is required";
+        }
+      }
+      else{
             axios.defaults.headers.common["Authorization"] = ""
             localStorage.removeItem('token')
             const formData = {
@@ -77,21 +107,11 @@ export default {
                 this.$router.push('/')
 
             }).catch(error=>{
-                if (error){
-
-                    this.errors = error.response.data
-                    // console.log(error.response.data)
-                    // this.error.push('error')
-                    // this.errors.push(error.response.data)
-                    
-                   
-                }
-                else if(error.message){
-                        this.error.push('Something went wrong. please try again')
-                    }
+                this.errorMsg = "Invalid username or password";
 
             })
         }
+    }
     }
 
 }
