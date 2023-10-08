@@ -7,11 +7,22 @@ UserModel = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = UserModel
-		fields = '__all__'
+		fields = ('first_name','last_name','email','password','gender','dob','phone','address')
+
+class UserCreateSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = UserModel
+		fields = ('first_name','last_name','email','password','gender','dob','phone','address','password','role_type')
 	# def create(self, clean_data):
 	# 	user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'], role_type= clean_data['password'], gender=clean_data['password'],dob = )
 	# 	user_obj.save()
 	# 	return user_obj
+
+
+class UserDataSerilizer(serializers.ModelSerializer):
+	class Meta:
+		model = UserModel
+		fields = ('id','first_name','last_name','email','gender','dob','phone','address','role_type')
 
 class UserLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()

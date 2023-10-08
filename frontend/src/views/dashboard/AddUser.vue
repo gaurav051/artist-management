@@ -1,9 +1,85 @@
 <template>
-    <div class="container">
-        <div class="columns">
-  <div class="column is-8 is-offset-2">
+    <div class="container mt-5">
+        <v-card class="p-5">
+            <v-card-title> Add User</v-card-title>
+            <v-card-body>
+        <v-form @submit.prevent="submitRegisterForm">
+            <v-row>
+                <v-col>
+                    <v-text-field variant="outlined" v-model="email" label="Email"></v-text-field>
+                </v-col>
+                <v-col>  
+                    <v-text-field  variant="outlined" v-model="password"  type="password" label="Password"></v-text-field>
+                </v-col>
+    
+            </v-row>
+            <v-row>
+                <v-col>
+                    <v-text-field variant="outlined" v-model="first_name" label="First Name"></v-text-field>
+                </v-col>
+                <v-col>  
+                    <v-text-field  variant="outlined" v-model="last_name"  label="Last Name"></v-text-field>
+                </v-col>
+    
+            </v-row>
+            <v-row>
+                <v-col>
+                    <v-text-field variant="outlined" v-model="dob" label="Date of Birth" type="date"></v-text-field>
+                </v-col>
+                <v-col>  
+                    <v-select variant="outlined"
+                        v-model="gender"
+                        :items="genderItems"
+                        item-title="name"
+                        item-value="code"
+                        label="Select Gender"
+                    ></v-select>
+                </v-col>
+    
+            </v-row>
+            <v-row>
+                <v-col>
+                    <v-select variant="outlined"
+                        v-model="role_type"
+                        :items="roleItems"
+                        item-title="name"
+                        item-value="code"
+                        label="Select Role"
+                    ></v-select>
+                </v-col>
+                <v-col>  
+                    <v-text-field variant="outlined" v-model="phone"  label="Phone"></v-text-field>
+                </v-col>
+    
+            </v-row>
+           
+            <v-row>
+                <v-col>
+                    <v-text-field variant="outlined" v-model="address" label="Address"></v-text-field>
+                </v-col>
+    
+            </v-row>
+
+  
+
+    
+
+
+    <v-btn
+      class="me-4"
+      type="submit"
+    >
+      submit
+    </v-btn>
+
+  
+  </v-form>
+</v-card-body>
+</v-card>
+        <!-- <div class="columns">
+  <div class="column is-6 is-offset-2">
         
-                <h1 class="title"> Register
+                <h1 class="title"> Add User
                 </h1>
                 <form  @submit.prevent="submitRegisterForm">
                     <div class="columns">
@@ -45,14 +121,21 @@
                 </div>
             </div>
                 <div class="columns">
-            <div class="column">
-                    <div class="field">
-                        <label>Date of Birth</label>
-                        <div class="control">
-                            <input type="date" name="dob" class="input" v-model="dob"/>
-                        </div>
-                    </div>
-                </div>
+            
+                <div class="column">
+                      
+                      <label>Role</label>
+                      <br/>
+                          <div class="select">
+  
+                            <select v-model="role_type">
+                                  <option value="super admin">Super Admin</option>
+                                  <option value="artist manager">Artist Manager</option>
+                                  <option value="artist">Artist</option>
+                              </select>
+                          </div>
+                       
+                      </div>
               
                     <div class="column">
                       
@@ -68,6 +151,15 @@
                           </div>
                        
                       </div>
+                      <div class="column">
+                    <div class="field">
+                        <label>Date of Birth</label>
+                        <div class="control">
+                            <input type="date" name="dob" class="input" v-model="dob"/>
+                        </div>
+                    </div>
+                </div>
+                     
                 
                    
             </div>
@@ -92,6 +184,8 @@
                         </div>
                     </div>
                 </div>
+                
+              
 
                 </div>
                     <div class="field">
@@ -103,7 +197,7 @@
                     
                 </form>
             </div>
-        </div>
+        </div> -->
     </div>
         
 </template>
@@ -113,26 +207,36 @@ import axios from 'axios'
 
 
 export default {
-    name:'Register',
+    name:'AddUser',
     data(){
         return {
             email :"",
             password:"",
+            gender:'',
             dob:"",
             address:"",
             first_name:"",
             last_name:"",
             phone:"",
+            role_type:"",
             errors:[],
-            errorMsg:''
+            errorMsg:'',
+            genderItems:[
+                    { name: 'Male', code: 'm' },
+                    { name: 'Female', code: 'f' },
+                    { name: 'Other', code: 'o' },
+                    ],
+            roleItems:[
+                    { name: 'Super Admin', code: 'super admin' },
+                    { name: 'Artist Manager', code: 'artist manager' },
+                    { name: 'Artist', code: 'artist' },
+
+            ]
         }
     },
     
     methods:{
         submitRegisterForm(){
-           
-            axios.defaults.headers.common["Authorization"] = ""
-            localStorage.removeItem('token')
             const formData = {
                 email: this.email,
                 password: this.password,
@@ -140,12 +244,13 @@ export default {
                 first_name: this.first_name,
                 last_name: this.last_name,
                 gender: this.gender,
+                role_type: this.role_type,
                 phone: this.phone,
                 address: this.address
             }
-            axios.post('/api/register', formData).then(response=>{
+            axios.post('/api/add/user/', formData).then(response=>{
                 bulmaToast.toast({ message: 'Successfullt registered' })
-                this.$router.push('/login')
+                this.$router.push('/users')
                 
 
             }).catch(error=>{

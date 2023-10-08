@@ -3,7 +3,10 @@ import store from '../store'
 import HomeView from '../views/HomeView.vue'
 import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
+import UserList from '../views/dashboard/UserList.vue'
+import AddUser from '../views/dashboard/AddUser.vue'
 import Dashboard from '../views/dashboard/Dashboard.vue'
+
 
 const routes = [
 
@@ -25,6 +28,23 @@ const routes = [
       requireLogin:true
     }
   },
+  {
+    path: '/users',
+    name: 'users',
+    component: UserList,
+    meta:{
+      requireLogin:true
+    }
+  },
+  {
+    path: '/add-user',
+    name: 'user.add',
+    component: AddUser,
+    meta:{
+      requireLogin:true
+    }
+  },
+  
   {
     path: '/about',
     name: 'about',
