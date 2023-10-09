@@ -4,6 +4,10 @@ import HomeView from '../views/HomeView.vue'
 import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
 import UserList from '../views/dashboard/UserList.vue'
+import ArtistList from '../views/dashboard/ArtistList.vue'
+import AddArtist from '../views/dashboard/AddArtist.vue'
+import AddSong from '../views/dashboard/AddSong.vue'
+import SongList from '../views/dashboard/SongList.vue'
 import AddUser from '../views/dashboard/AddUser.vue'
 import Dashboard from '../views/dashboard/Dashboard.vue'
 
@@ -37,9 +41,41 @@ const routes = [
     }
   },
   {
+    path: '/artist',
+    name: 'artists',
+    component: ArtistList,
+    meta:{
+      requireLogin:true
+    }
+  },
+  {
+    path: '/add-artist',
+    name: 'add.artists',
+    component: AddArtist,
+    meta:{
+      requireLogin:true
+    }
+  },
+  {
     path: '/add-user',
     name: 'user.add',
     component: AddUser,
+    meta:{
+      requireLogin:true
+    }
+  },
+  {
+    path: '/music/:id',
+    name: 'songs',
+    component: SongList,
+    meta:{
+      requireLogin:true
+    }
+  },
+  {
+    path: '/add-music/:id',
+    name: 'add.song',
+    component: AddSong,
     meta:{
       requireLogin:true
     }

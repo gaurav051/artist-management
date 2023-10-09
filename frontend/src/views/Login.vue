@@ -13,37 +13,21 @@
               >
                 {{ errorMsg }}
               </div>
-                 
-                    
                     <div class="field">
                         <label>Email</label>
                         <div class="control">
                             <input type="email" name="email" class="input" v-model="email"/>
                         </div>
                         <div class="notification is-danger" v-if="errors['email']">
-                           
                            <p> {{ errors["email"] }}</p>
-                          
-   
                        </div>
-                        
-                   
                     </div>
-               
-               
                     <div class="field">
                         <label>Password</label>
                         <div class="control">
                             <input type="password" name="password" class="input" v-model="password"/>
                         </div>
-                      
                     </div>
-                    <!-- <span
-                  v-if="errors['username'] && username == ''"
-                  class="text-danger"
-                >
-                  {{ errors["username"] }}
-                </span> -->
                     <div class="notification is-danger" v-if="errors['password']">
                            
                         <p> {{ errors["password"] }}</p>

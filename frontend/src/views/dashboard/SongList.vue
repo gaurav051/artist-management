@@ -19,8 +19,8 @@
         ></v-divider>
         
         <v-spacer></v-spacer>
-        <router-link to="/add-artist" class="button is-success"> <v-btn
-              color="primary"> Add Artist </v-btn></router-link>
+        <router-link :to="{name:'add.song',params:{id:$route.params.id}}" class="button is-success"> <v-btn
+              color="primary"> Add Songs </v-btn></router-link>
         <v-dialog
           v-model="dialog"
           max-width="500px"
@@ -52,10 +52,10 @@
                     md="6"
                   >
                     <v-text-field variant="outlined"
-                      v-model="editedItem.email"
-                      label="Email"
-                      :rules="emailRules"
-                      disabled
+                      v-model="editedItem.title"
+                      label="Title"
+                      :rules="nameRules"
+                   
                     ></v-text-field>
                   </v-col>
                  
@@ -65,83 +65,28 @@
                     md="6"
                   >
                     <v-text-field variant="outlined"
-                      v-model="editedItem.first_name"
-                      label="First Name"
+                      v-model="editedItem.album_name"
+                      label="Album Name"
                       :rules="nameRules"
                     ></v-text-field>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-                    <v-text-field variant="outlined"
-                      v-model="editedItem.last_name"
-                      :rules="nameRules"
-                      label="Last Name"
-                    ></v-text-field>
-                  </v-col>
+                 
                   <v-col
                     cols="12"
                     sm="6"
                     md="6"
                   >
                   <v-select variant="outlined"
-                        v-model="editedItem.gender"
+                        v-model="editedItem.genre"
                         :rules="nameRules"
-                        :items="genderItems"
+                        :items="genreItems"
                         item-title="name"
                         item-value="code"
-                        label="Select Gender"
+                        label="Select Genre"
                     ></v-select>
                     
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-                    <v-text-field variant="outlined"
-                      v-model="editedItem.phone"
-                      :rules="nameRules"
-                      label="Phone"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-                    <v-text-field variant="outlined"
-                      v-model="editedItem.address"
-                      :rules="nameRules"
-                      label="Address"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
                   
-                  <v-text-field variant="outlined"
-                      v-model="editedItem.first_release_year"
-                      :rules="nameRules"
-                      label="First Release Year"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-                  
-                  <v-text-field variant="outlined"
-                      v-model="editedItem.no_of_albums_releases"
-                      :rules="nameRules"
-                      label="No of Albums releases"
-                    ></v-text-field>
-                  </v-col>
                  
                  
                   
@@ -183,14 +128,14 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon
+      <!-- <v-icon
         size="small"
         class="me-2"
         @click="songItem(item)"
         icon="mdi-music"
       >
         
-      </v-icon>
+      </v-icon> -->
       <v-icon
         size="small"
         class="me-2"
@@ -232,19 +177,21 @@ export default {
         nameRules: [
         v => !!v || 'This field is required'
       ],
-      genderItems:[
-                    { name: 'Male', code: 'm' },
-                    { name: 'Female', code: 'f' },
-                    { name: 'Other', code: 'o' },
+      genreItems:[
+                    { name: 'R&B', code: 'rnb' },
+                    { name: 'Country', code: 'country' },
+                    { name: 'Classic', code: 'classic' },
+                    { name: 'Rock', code: 'rock' },
+                    { name: 'Jazz', code: 'jazz' },
                     ],
            
       dialog: false,
       dialogDelete: false,
       headers: [
        
-        { title: 'Email', key: 'email' },
-        { title: 'First Name', key: 'first_name' },
-        { title: 'Last Name', key: 'last_name' },
+        { title: 'Title', key: 'title' },
+        { title: 'Album Name', key: 'album_name' },
+        { title: 'Genre', key: 'genre' },
         
         { title: 'Actions', key: 'actions', sortable: false },
       ],
@@ -253,26 +200,17 @@ export default {
       formError : false,
       editedItem: {
         id: 0,
-        first_name: '',
-        last_name: '',
-        email:'',
-        gender: '',
-        phone:'',
-        address:'',
-        no_of_albums_releases:'',
-        first_release_year:''
+        title: '',
+        album_name: '',
+        genre:'',
+        
 
       },
       defaultItem: {
         id: 0,
-        first_name: '',
-        last_name: '',
-        email:'',
-        gender: '',
-        phone:'',
-        address:'',
-        no_of_albums_releases:'',
-        first_release_year:''
+        title: '',
+        album_name: '',
+        genre:'',
       },
     }),
     components: {
@@ -288,8 +226,10 @@ export default {
         
       },
       async initialize () {
+        const id = this.$route.params.id
+        console.log(id);
 
-        await axios.get('api/get/artist/list/').then(response=>{
+        await axios.get('api/get/songs-list/'+id).then(response=>{
             console.log(response.data.data);
             this.UserData = response.data.data
         }).catch(error=>{
@@ -307,7 +247,7 @@ export default {
       },
       songItem(item){
         this.$router.push({
-          name:"songs",params:{id:item.id}
+          name:"songs","params":item.id
         })
       },
       deleteItem (item) {
@@ -343,7 +283,8 @@ export default {
                 
             }
             else{
-                axios.post('/api/update/artist/'+this.editedItem.id+'/', this.editedItem).then(response=>{
+               
+                axios.post('/api/update/song/'+this.editedItem.id+'/', this.editedItem).then(response=>{
                 bulmaToast.toast({ message: 'User successfully updated' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
 

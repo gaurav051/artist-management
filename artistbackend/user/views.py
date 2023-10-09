@@ -21,6 +21,7 @@ class UserRegister(APIView):
 			if user:
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
+	
 
 
 class UserLogin(APIView):
@@ -123,6 +124,6 @@ class CreateUser(APIView):
 			user.save()
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
 		else:
-			return Response({"data":serilizer.errors})
+			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 
