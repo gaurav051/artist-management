@@ -6,25 +6,26 @@
         <v-form @submit.prevent="submitRegisterForm">
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="email" label="Email"></v-text-field>
+                
+                    <v-text-field variant="outlined" v-model="email" label="Email" :rules="emailRules" :error-messages="errors?errors?.email?.length?errors.email[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
-                    <v-text-field  variant="outlined" v-model="password"  type="password" label="Password"></v-text-field>
+                    <v-text-field  variant="outlined" v-model="password"  type="password" label="Password" :rules="nameRules" :error-messages="errors?errors?.password?.length?errors.password[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="first_name" label="First Name"></v-text-field>
+                    <v-text-field variant="outlined" v-model="first_name" label="First Name" :rules="nameRules" :error-messages="errors?errors?.first_name?.length?errors.first_name[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
-                    <v-text-field  variant="outlined" v-model="last_name"  label="Last Name"></v-text-field>
+                    <v-text-field  variant="outlined" v-model="last_name"  label="Last Name" :rules="nameRules" :error-messages="errors?errors?.last_name?.length?errors.last_name[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="dob" label="Date of Birth" type="date"></v-text-field>
+                    <v-text-field variant="outlined" v-model="dob" label="Date of Birth" type="date" :rules="nameRules" :error-messages="errors?errors?.dob?.length?errors.dob[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
                     <v-select variant="outlined"
@@ -48,14 +49,14 @@
                     ></v-select>
                 </v-col>
                 <v-col>  
-                    <v-text-field variant="outlined" v-model="phone"  label="Phone"></v-text-field>
+                    <v-text-field variant="outlined" v-model="phone"  label="Phone" :rules="nameRules" :error-messages="errors?errors?.phone?.length?errors.phone[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
            
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="address" label="Address"></v-text-field>
+                    <v-text-field variant="outlined" v-model="address" label="Address"  :rules="nameRules" :error-messages="errors?errors?.address?.length?errors.address[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
@@ -204,6 +205,14 @@ export default {
     name:'AddUser',
     data(){
         return {
+            emailRules: [ 
+        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
+        v => !!v || 'This field is required',
+      ],
+        nameRules: [
+        v => !!v || 'This field is required'
+      ],
+            errors:"",
             email :"",
             password:"",
             gender:'',
@@ -213,7 +222,6 @@ export default {
             last_name:"",
             phone:"",
             role_type:"",
-            errors:[],
             errorMsg:'',
             genderItems:[
                     { name: 'Male', code: 'm' },
@@ -248,7 +256,8 @@ export default {
                 
 
             }).catch(error=>{
-                this.errors = error
+                console.log(error)
+                this.errors = error.response.data.data
 
             })
         }

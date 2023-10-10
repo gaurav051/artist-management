@@ -128,6 +128,7 @@
                       v-model="editedItem.first_release_year"
                       :rules="nameRules"
                       label="First Release Year"
+                      type="number"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -140,6 +141,7 @@
                       v-model="editedItem.no_of_albums_releases"
                       :rules="nameRules"
                       label="No of Albums releases"
+                      type="number"
                     ></v-text-field>
                   </v-col>
                  

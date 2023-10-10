@@ -7,10 +7,10 @@
             
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="title" label="Title"></v-text-field>
+                    <v-text-field variant="outlined" v-model="title" label="Title" :rules="nameRules" :error-messages="errors?errors?.title?.length?errors.title[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
-                    <v-text-field  variant="outlined" v-model="album_name"  label="Album Name"></v-text-field>
+                    <v-text-field  variant="outlined" v-model="album_name"  label="Album Name" :rules="nameRules" :error-messages="errors?errors?.album_name?.length?errors.album_name[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
@@ -23,6 +23,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Genre"
+                        :rules="nameRules" :error-messages="errors?errors?.genre?.length?errors.genre[0]:'':''"
                     ></v-select>
                 </v-col>
     
@@ -55,8 +56,11 @@ export default {
             title :"",
             album_name:"",
             genre:"",
-            errors:[],
-            errorMsg:'',
+            errors:"",
+       
+        nameRules: [
+        v => !!v || 'This field is required'
+      ],
             genreItems:[
                     { name: 'R&B', code: 'rnb' },
                     { name: 'Country', code: 'country' },
@@ -82,7 +86,7 @@ export default {
                 
 
             }).catch(error=>{
-                this.errors = error
+                this.errors = error.response.data.data
 
             })
         }

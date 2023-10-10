@@ -55,6 +55,8 @@
                       v-model="editedItem.email"
                       label="Email"
                       :rules="emailRules"
+                      disabled="true"
+                      :error-messages="errors?errors?.email?.length?errors.email[0]:'':''"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -69,12 +71,8 @@
                         item-title="name"
                         item-value="code"
                         label="Select Role"
+                        :error-messages="errors?errors?.role_type?.length?errors.role_type[0]:'':''"
                     ></v-select>
-                    <!-- <v-text-field variant="outlined"
-                      v-model="editedItem.role_type"
-                      label="Role"
-                      :rules="nameRules"
-                    ></v-text-field> -->
                   </v-col>
                   <v-col
                     cols="12"
@@ -85,6 +83,7 @@
                       v-model="editedItem.first_name"
                       label="First Name"
                       :rules="nameRules"
+                      :error-messages="errors?errors?.first_name?.length?errors.first_name[0]:'':''"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -96,6 +95,7 @@
                       v-model="editedItem.last_name"
                       :rules="nameRules"
                       label="Last Name"
+                      :error-messages="errors?errors?.last_name?.length?errors.last_name[0]:'':''"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -110,6 +110,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Gender"
+                        :error-messages="errors?errors?.gender?.length?errors.gender[0]:'':''"
                     ></v-select>
                     
                   </v-col>
@@ -122,6 +123,7 @@
                       v-model="editedItem.phone"
                       :rules="nameRules"
                       label="Phone"
+                      :error-messages="errors?errors?.phone?.length?errors.phone[0]:'':''"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -133,6 +135,7 @@
                       v-model="editedItem.address"
                       :rules="nameRules"
                       label="Address"
+                      :error-messages="errors?errors?.address?.length?errors.address[0]:'':''"
                     ></v-text-field>
                   </v-col>
                  
@@ -210,6 +213,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 export default {
     name:'UserList',
     data: () => ({
+      errors:"",
         emailRules: [ 
         v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
         v => !!v || 'This field is required',
@@ -303,6 +307,7 @@ export default {
         this.closeDelete()
       },
       close () {
+        this.errors ="";
         this.dialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
@@ -332,6 +337,7 @@ export default {
 
                     this.close();
         }).catch(error=>{
+          this.errors = error.response.data
             console.log(error)
         });
                 

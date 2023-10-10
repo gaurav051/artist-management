@@ -8,6 +8,7 @@ djangorestframework = "*"
 django-cors-headers = "*"
 django = "==4.1"
 drf-jwt = "*"
+bcrypt = "*"
 
 [dev-packages]
 

@@ -55,6 +55,7 @@
                       v-model="editedItem.title"
                       label="Title"
                       :rules="nameRules"
+                      :error-messages="errors?errors?.title?.length?errors.title[0]:'':''"
                    
                     ></v-text-field>
                   </v-col>
@@ -68,6 +69,7 @@
                       v-model="editedItem.album_name"
                       label="Album Name"
                       :rules="nameRules"
+                      :error-messages="errors?errors?.album_name?.length?errors.album_name[0]:'':''"
                     ></v-text-field>
                   </v-col>
                  
@@ -83,6 +85,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Genre"
+                        :error-messages="errors?errors?.genre?.length?errors.genre[0]:'':''"
                     ></v-select>
                     
                   </v-col>
@@ -170,6 +173,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 export default {
     name:'UserList',
     data: () => ({
+      errors:"",
         emailRules: [ 
         v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
         v => !!v || 'This field is required',
@@ -261,6 +265,7 @@ export default {
       },
       close () {
         this.dialog = false
+        this.errors ="";
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
@@ -291,6 +296,7 @@ export default {
                     this.close();
         }).catch(error=>{
             console.log(error)
+            this.error = error.response.data.data
         });
                 
                 

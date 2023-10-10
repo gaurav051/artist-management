@@ -7,6 +7,9 @@ from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerial
 from rest_framework import permissions, status
 from .validations import custom_validation, validate_email, validate_password
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from django.contrib.auth.hashers import make_password
+from django.db import connection
+import datetime
 
 
 class UserRegister(APIView):
@@ -71,11 +74,16 @@ class GetUserList(APIView):
 
 	def get(self,request):
 		if request.user.role_type == 'super admin':
-			users = User.objects.filter(role_type__in=['super admin','artist manager','artist']).exclude(id=request.user.id)
+
+			query = '''select * from user where role_type in ('super admin','artist manager','artist') and id!="'''+str(request.user.id)+'''";'''
+			users = User.objects.raw(query)
+			# users = User.objects.filter(role_type__in=['super admin','artist manager','artist']).exclude(id=request.user.id)
 			serilizer= UserDataSerilizer(users, many=True)
 			data = serilizer.data
 		elif request.user.role_type == 'artist manager':
-			users = User.objects.filter(role_type__in=['artist manager','artist']).exclude(id=request.user.id)
+			users = '''select * from user where role_type in ('artist manager','artist') and id!="'''+str(request.user.id)+'''";'''
+			users = User.objects.raw(query)
+			# users = User.objects.filter(role_type__in=['artist manager','artist']).exclude(id=request.user.id)
 			serilizer= UserDataSerilizer(users, many=True)
 			data = serilizer.data
 		else:
@@ -106,10 +114,14 @@ class UpdateUser(APIView):
 		users = User.objects.get(id=pk)
 		serilizer= UserDataSerilizer(users,data = request.data)
 		if serilizer.is_valid():
-			serilizer.save()
+			data = request.data
+			cursor = connection.cursor()
+			user_query = 'update user set first_name="'+data['first_name']+'",last_name="'+data["last_name"]+'",dob="'+data["dob"]+'",gender="'+data["gender"] +'",phone="'+data["phone"]+'",address="'+data["address"]+'" where id ="'+str(pk)+'";'
+			print(user_query)
+			cursor.execute(user_query)
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
 		else:
-			return Response({"data":serilizer.errors})
+			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 class CreateUser(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
@@ -117,11 +129,15 @@ class CreateUser(APIView):
 	def post(self,request):
 		# if request.user.role_type == 'super admin':
 		# users = User.objects.get(id=pk)
-		serilizer= UserCreateSerializer(data = request.data)
+		data = request.data
+		serilizer= UserCreateSerializer(data = data)
 		if serilizer.is_valid():
-			user = serilizer.save()
-			user.set_password(request.data["password"])
-			user.save()
+			now = datetime.datetime.now()
+			
+			password = make_password(data['password'])
+			cursor = connection.cursor()
+			query = 'insert into user (email, password, dob,is_superuser,is_staff,is_active, first_name, last_name, address, phone, gender, role_type,created_at, updated_at) values ("'+data["email"]+'","'+str(password)+'","'+data["dob"]+'","0","0","1","'+data["first_name"]+'","'+data["last_name"]+'","'+data["address"]+'","'+data["phone"]+'","'+data["gender"]+'","'+data["role_type"]+'","'+str(now)+'","'+str(now)+'");'
+			cursor.execute(query)
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
 		else:
 			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)

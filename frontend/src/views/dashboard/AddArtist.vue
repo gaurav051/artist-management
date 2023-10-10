@@ -6,25 +6,25 @@
         <v-form @submit.prevent="submitRegisterForm">
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="email" label="Email"></v-text-field>
+                    <v-text-field variant="outlined" v-model="email" label="Email" :rules="emailRules" :error-messages="errors?errors?.email?.length?errors.email[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
-                    <v-text-field  variant="outlined" v-model="password"  type="password" label="Password"></v-text-field>
+                    <v-text-field  variant="outlined" v-model="password"  type="password" label="Password" :rules="nameRules" :error-messages="errors?errors?.password?.length?errors.password[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="first_name" label="First Name"></v-text-field>
+                    <v-text-field variant="outlined" v-model="first_name" label="First Name" :rules="nameRules" :error-messages="errors?errors?.first_name?.length?errors.first_name[0]:'':''" ></v-text-field>
                 </v-col>
                 <v-col>  
-                    <v-text-field  variant="outlined" v-model="last_name"  label="Last Name"></v-text-field>
+                    <v-text-field  variant="outlined" v-model="last_name"  label="Last Name" :rules="nameRules" :error-messages="errors?errors?.last_name?.length?errors.last_name[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
             <v-row>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="dob" label="Date of Birth" type="date"></v-text-field>
+                    <v-text-field variant="outlined" v-model="dob" label="Date of Birth" type="date" :rules="nameRules" :error-messages="errors?errors?.dob?.length?errors.dob[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>  
                     <v-select variant="outlined"
@@ -33,6 +33,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Gender"
+                        :rules="nameRules" :error-messages="errors?errors?.gender?.length?errors.gender[0]:'':''"
                     ></v-select>
                 </v-col>
     
@@ -40,20 +41,20 @@
             <v-row>
               
                 <v-col>  
-                    <v-text-field variant="outlined" v-model="phone"  label="Phone"></v-text-field>
+                    <v-text-field variant="outlined" v-model="phone"  label="Phone" :rules="nameRules" :error-messages="errors?errors?.phone?.length?errors.phone[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>
-                    <v-text-field variant="outlined" v-model="address" label="Address"></v-text-field>
+                    <v-text-field variant="outlined" v-model="address" label="Address" :rules="nameRules" :error-messages="errors?errors?.address?.length?errors.address[0]:'':''"></v-text-field>
                 </v-col>
     
             </v-row>
            
             <v-row>
                 <v-col>  
-                    <v-text-field type="number" min="1900" max="2099" step="1" variant="outlined" v-model="first_release_year"  label="First Release Year"></v-text-field>
+                    <v-text-field type="number" min="1900" max="2099" step="1" variant="outlined" v-model="first_release_year"  label="First Release Year" :rules="nameRules" :error-messages="errors?errors?.first_release_year?.length?errors.first_release_year[0]:'':''"></v-text-field>
                 </v-col>
                 <v-col>
-                    <v-text-field type="number" variant="outlined" v-model="no_of_albums_releases" label="No of Albums Released"></v-text-field>
+                    <v-text-field type="number" variant="outlined" v-model="no_of_albums_releases" label="No of Albums Released" :rules="nameRules" :error-messages="errors?errors?.no_of_albums_releases?.length?errors.no_of_albums_releases[0]:'':''"></v-text-field>
                 </v-col>
                 
     
@@ -91,8 +92,14 @@ export default {
             phone:"",
             first_release_year:"",
             no_of_albums_releases:"",
-            errors:[],
-            errorMsg:'',
+            errors:"",
+        emailRules: [ 
+        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
+        v => !!v || 'This field is required',
+      ],
+        nameRules: [
+        v => !!v || 'This field is required'
+      ],
             genderItems:[
                     { name: 'Male', code: 'm' },
                     { name: 'Female', code: 'f' },

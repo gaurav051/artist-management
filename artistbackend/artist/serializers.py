@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.core.exceptions import ValidationError
 from artist.models import Artist, Music
+UserModel = get_user_model()
 
 class ArtistCreateSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True)
@@ -14,6 +15,12 @@ class ArtistCreateSerializer(serializers.Serializer):
     address = serializers.CharField(required=True)
     dob = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
+
+    def validate_email(self, email):
+        # if self.instance and email != self.instance.email:
+        if UserModel.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Email already exists")
+        return email
 
 
 class ArtistUpdateSerializer(serializers.Serializer):
