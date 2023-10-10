@@ -19,7 +19,7 @@
         ></v-divider>
         
         <v-spacer></v-spacer>
-        <router-link :to="{name:'add.song',params:{id:$route.params.id}}" class="button is-success"> <v-btn
+        <router-link :to="{name:'add.song',params:{id:$route.params.id}}" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"> <v-btn
               color="primary"> Add Songs </v-btn></router-link>
         <v-dialog
           v-model="dialog"
@@ -139,7 +139,7 @@
       >
         
       </v-icon> -->
-      <v-icon
+      <v-icon v-if="getCurrentUser.role_type == 'artist'"
         size="small"
         class="me-2"
         @click="editItem(item)"
@@ -169,9 +169,16 @@
 <script>
 import * as bulmaToast from 'bulma-toast'
 import axios from 'axios';
+import { mapGetters } from 'vuex';
 import { VDataTable } from 'vuetify/labs/VDataTable'
 export default {
     name:'UserList',
+    computed:{
+        ...mapGetters([
+            'getIsAuthenticated',
+            'getCurrentUser'
+        ])
+    },
     data: () => ({
       errors:"",
         emailRules: [ 

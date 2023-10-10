@@ -18,9 +18,24 @@
           vertical
         ></v-divider>
         
+        
         <v-spacer></v-spacer>
-        <router-link to="/add-artist" class="button is-success"> <v-btn
-              color="primary"> Add Artist </v-btn></router-link>
+        <!-- <v-icon
+        size="large"
+        class="me-2"
+        @click="getCSV(UserData)"
+        icon="mdi-excel"
+      >
+        
+      </v-icon> -->
+        <v-btn @click="getCSV(UserData)"
+              color="success"> Export </v-btn>
+        <router-link to="/add-artist" class="button is-success" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
+              color="primary"> Add Artist</v-btn></router-link>
+              
+              <input type="file" id="UploadFile" accept=".csv"/>
+              <v-btn @click="importCsv()"
+              color="success"> Submit </v-btn>
         <v-dialog
           v-model="dialog"
           max-width="500px"
@@ -44,6 +59,7 @@
 
             <v-card-text>
               <v-container>
+                <!-- <pre id="csvData"></pre> -->
                 <v-form ref="form">
                 <v-row>
                   <v-col
@@ -193,7 +209,7 @@
       >
         
       </v-icon>
-      <v-icon
+      <v-icon v-if="getCurrentUser.role_type == 'artist manager'"
         size="small"
         class="me-2"
         @click="editItem(item)"
@@ -221,11 +237,19 @@
     </div>
 </template>
 <script>
+
+import { mapGetters } from 'vuex';
 import * as bulmaToast from 'bulma-toast'
 import axios from 'axios';
 import { VDataTable } from 'vuetify/labs/VDataTable'
 export default {
     name:'UserList',
+    computed:{
+        ...mapGetters([
+            'getIsAuthenticated',
+            'getCurrentUser'
+        ])
+    },
     data: () => ({
         emailRules: [ 
         v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
@@ -335,6 +359,60 @@ export default {
           this.editedIndex = -1
         })
       },
+      importCsv(){
+        var file = document.getElementById('UploadFile').files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const contents = e.target.result;
+                const lines = contents.split("\n");
+
+                // Assuming the first row contains headers
+                const headers = lines[0].split(",");
+
+                const data = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                  if (lines[i]!=''){
+                    const values = lines[i].split(",");
+                    
+                    const entry = {};
+
+
+                    for (let j = 0; j < headers.length; j++) {
+                        entry[headers[j].trim()] = values[j].trim();
+                    }
+
+                    data.push(entry);
+                  }
+                }
+                console.log(data);
+
+                // Display the parsed CSV data
+               // csvDataDisplay.textContent = JSON.stringify(data, null, 2);
+            };
+
+            reader.readAsText(file);
+        }
+    
+
+      },
+     getCSV(jsonData) {
+     
+      const arr = typeof jsonData !== 'object' ? JSON.parse(jsonData) : jsonData;
+    const str = `${Object.keys(arr[0]).map((value) => `${value}`).join(',')}\r\n`;
+    const csvContent = arr.reduce((st, next) => {
+      st += `${Object.values(next).map((value) => 
+        `${value}`).join(',')}\r\n`;
+         return st;
+      }, str);
+    const element = document.createElement('a');
+    element.href = `data:text/csv;charset=utf8,${encodeURI(csvContent)}`;
+    element.target = '_blank';
+    element.download = 'artist.csv';
+    element.click();    
+},
       async save () {
         if (this.editedIndex > -1) {
             const {valid}  = await this.$refs.form.validate();
