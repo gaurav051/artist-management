@@ -12,6 +12,14 @@ from django.db import connection
 import datetime
 
 
+def dictfetchall(cursor): 
+    "Returns all rows from a cursor as a dict" 
+    desc = cursor.description 
+    return [
+            dict(zip([col[0] for col in desc], row)) 
+            for row in cursor.fetchall() 
+    ]
+
 class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 	def post(self, request):
@@ -74,36 +82,24 @@ class GetUserList(APIView):
 
 	def get(self,request):
 		if request.user.role_type == 'super admin':
+			cursor = connection.cursor()
+			cursor.execute("select email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in ('super admin','artist manager','artist') and id!=%s",[str(request.user.id),])
+			data = dictfetchall(cursor)
 
-			query = '''select * from user where role_type in ('super admin','artist manager','artist') and id!="'''+str(request.user.id)+'''";'''
-			users = User.objects.raw(query)
+			# users = User.objects.raw(query)
 			# users = User.objects.filter(role_type__in=['super admin','artist manager','artist']).exclude(id=request.user.id)
-			serilizer= UserDataSerilizer(users, many=True)
-			data = serilizer.data
+			# serilizer= UserDataSerilizer(users, many=True)
+			# data = serilizer.data
 		elif request.user.role_type == 'artist manager':
-			users = '''select * from user where role_type in ('artist manager','artist') and id!="'''+str(request.user.id)+'''";'''
-			users = User.objects.raw(query)
+			cursor = connection.cursor()
+			cursor.exceute("select email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in (,'artist manager','artist') and id!=%s",[str(request.user.id),])
+			data = dictfetchall(cursor)
+			# users = User.objects.raw(query)
 			# users = User.objects.filter(role_type__in=['artist manager','artist']).exclude(id=request.user.id)
-			serilizer= UserDataSerilizer(users, many=True)
-			data = serilizer.data
+			# serilizer= UserDataSerilizer(users, many=True)
+			# data = serilizer.data
 		else:
 			data=[]
-		return Response({"data":data},status=status.HTTP_200_OK)
-
-class GetUserByID(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-
-	def get(self,request, pk):
-		if request.user.role_type == 'super admin':
-			users = User.objects.filter(role_type__in=['super admin','artist manager','artist'], id=pk).exclude(id=request.user.id).last()
-			serilizer= UserDataSerilizer(users)
-			data = serilizer.data
-		elif request.user.role_type == 'artist manager':
-			users = User.objects.filter(role_type__in=['artist manager','artist'], id=pk).exclude(id=request.user.id).last()
-			serilizer= UserDataSerilizer(users)
-			data = serilizer.data
-		else:
-			data={}
 		return Response({"data":data},status=status.HTTP_200_OK)
 
 class UpdateUser(APIView):
@@ -116,9 +112,11 @@ class UpdateUser(APIView):
 		if serilizer.is_valid():
 			data = request.data
 			cursor = connection.cursor()
-			user_query = 'update user set first_name="'+data['first_name']+'",last_name="'+data["last_name"]+'",dob="'+data["dob"]+'",gender="'+data["gender"] +'",phone="'+data["phone"]+'",address="'+data["address"]+'" where id ="'+str(pk)+'";'
-			print(user_query)
-			cursor.execute(user_query)
+			# [data['first_name'], data["last_name"], data["dob"], +data["gender"], data["phone"], data["address"], str(pk)]
+			# user_query = 'update user set first_name="'+data['first_name']+'",last_name="'+data["last_name"]+'",dob="'+data["dob"]+'",gender="'+data["gender"] +'",phone="'+data["phone"]+'",address="'+data["address"]+'" where id ="'+str(pk)+'";'
+			user_query = 'update user set first_name=%s,last_name=%s,dob=%s,gender=%s,phone=%s,address=%s where id =%s;'
+
+			cursor.execute(user_query,[data['first_name'],data["last_name"],data["dob"],data["gender"],data["phone"],data["address"],str(pk)] )
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
 		else:
 			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
@@ -136,8 +134,10 @@ class CreateUser(APIView):
 			
 			password = make_password(data['password'])
 			cursor = connection.cursor()
-			query = 'insert into user (email, password, dob,is_superuser,is_staff,is_active, first_name, last_name, address, phone, gender, role_type,created_at, updated_at) values ("'+data["email"]+'","'+str(password)+'","'+data["dob"]+'","0","0","1","'+data["first_name"]+'","'+data["last_name"]+'","'+data["address"]+'","'+data["phone"]+'","'+data["gender"]+'","'+data["role_type"]+'","'+str(now)+'","'+str(now)+'");'
-			cursor.execute(query)
+
+			
+			query = 'insert into user (email, password, dob,is_superuser,is_staff,is_active, first_name, last_name, address, phone, gender, role_type,created_at, updated_at) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
+			cursor.execute(query,[data["email"], str(password),data["dob"], "0","0","1",data["first_name"],data["last_name"],data["address"],data["phone"],data["gender"],data["role_type"],str(now),str(now)])
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
 		else:
 			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
