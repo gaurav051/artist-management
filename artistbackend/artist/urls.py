@@ -15,5 +15,8 @@ urlpatterns = [
 
     
     path('get/songs/', views.GetSelfSongList.as_view()),
+    path('get/sample-artist/', views.GetSampleArtistFile.as_view()),
+    path('get/sample-song/', views.GetSampleSongFile.as_view()),
+    
 
 ]

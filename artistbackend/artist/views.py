@@ -9,10 +9,13 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 import datetime
+from pathlib import Path
 UserModel = get_user_model()
 from django.db import connection
-
+import os
+from django.conf import settings
 from collections import namedtuple
+from django.http import HttpResponse, HttpResponseNotFound
 
 
 def namedtuplefetchall(cursor):
@@ -184,3 +187,57 @@ class GetSelfSongList(APIView):
 		else:
 			data=[]
 		return Response({"data":data},status=status.HTTP_200_OK)
+	
+
+class GetSampleArtistFile(APIView):
+	permissions_classes =  (permissions.IsAuthenticated,)
+	def get(self,request):
+		BASE_DIR = Path(__file__).resolve().parent.parent
+		print(BASE_DIR)
+		file_location = BASE_DIR/'static/sampleartist.csv'
+		print(file_location)
+		try:    
+			with open(file_location, 'r') as f:
+				file_data = f.read()
+				# sending response 
+				response = HttpResponse(file_data, content_type='text/csv')
+				response['Content-Disposition'] = 'attachment; filename="sample.csv"'
+
+		except IOError:
+			# handle file not exist case here
+			response = HttpResponseNotFound('<h1>File not exist</h1>')
+
+		return response
+
+
+class GetSampleSongFile(APIView):
+	permissions_classes =  (permissions.IsAuthenticated,)
+	def get(self,request):
+		BASE_DIR = Path(__file__).resolve().parent.parent
+		print(BASE_DIR)
+		file_location = BASE_DIR/'static/songsample.csv'
+		print(file_location)
+		try:    
+			with open(file_location, 'r') as f:
+				file_data = f.read()
+				# sending response 
+				response = HttpResponse(file_data, content_type='text/csv')
+				response['Content-Disposition'] = 'attachment; filename="sample.csv"'
+
+		except IOError:
+			# handle file not exist case here
+			response = HttpResponseNotFound('<h1>File not exist</h1>')
+
+		return response
+
+class SongBulkUpdate(APIView):
+	permissions_classes =  (permissions.IsAuthenticated,)
+	def post(self,request):
+		data = request.data
+		serializer = ParamSerializer(data=data)
+		if serilizer.is_valid():
+			pass
+			return Response({"meaasge":"data updated successfully"}, status=status.HTTP_400_BAD_REQUEST)
+		else:
+			return Response({"data":serilzier.errors}, status=status.HTTP_400_BAD_REQUEST)
+

@@ -19,6 +19,30 @@
         ></v-divider>
         
         <v-spacer></v-spacer>
+        <v-btn @click="getCSV(UserData)"
+              color="success"> <v-tooltip
+        activator="parent"
+        location="start"
+      >Download csv</v-tooltip>  <v-icon
+        size="large"
+        class="me-2"
+        
+        icon="mdi-download"
+      >
+        
+      </v-icon> </v-btn>
+        
+              <v-btn @click="showModal">  <v-tooltip
+        activator="parent"
+        location="end"
+      >Upload csv</v-tooltip><v-icon
+        size="large"
+        class="me-2"
+       
+        icon="mdi-upload"
+      >
+        
+      </v-icon></v-btn>
         <router-link :to="{name:'add.song',params:{id:$route.params.id}}" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"> <v-btn
               color="primary"> Add Songs </v-btn></router-link>
         <v-dialog
@@ -164,7 +188,68 @@
       </v-btn>
     </template>
     </v-data-table>
+    <div id="myModal" class="modal" >
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span @click="closeModal" class="close mr-5">&times;</span>
+        
+        <div class="modal-header">
+          
+          <h2>Import Csv File  <v-btn class="ml-10" @click="downloadSample">Download sample</v-btn></h2>
+        </div>
+        
+        <div class="modal-body">
+          <input type="file" id="UploadFile" accept=".csv"/>
+          
+          <v-btn @click="importCsv()"
+                    color="success"> Preview data </v-btn>
+                    <div v-if="importedData.length>0">
+                      <table :style="'width:90%'" class="mt-5" >
+                        <!-- <tr>
+                          <th :style="'border:1px solid black;'" v-for="(item,index) in importedHeader" :key="index" >{{ item }}</th>
+                        </tr> -->
+                        <br/>
+                       
+                        <tr v-for="(item,index) in importedData" :key="index">
+                          <td> <v-text-field  variant="outlined" color="primary"
+                      v-model="item.title"
+                      label="Title"
+                      :rules="nameRules"
+                      
+                    ></v-text-field></td>
+                          <td ><v-text-field class="ml-5" variant="outlined" color="primary"
+                      v-model="item.album_name"
+                      label="Album Name"
+                      :rules="nameRules"
+                    ></v-text-field></td>
+                          <td> <v-select class="ml-5"
+                        v-model="item.genre"
+                        :rules="nameRules"
+                        :items="genreItems"
+                        variant="outlined" color="primary"
+                        item-title="name"
+                        item-value="code"
+                        label="Select Genre"
+                      
+                    ></v-select></td>
+
+                        </tr>
+                        
+                      </table>
+
+                    </div>
+        </div>
+        <div class="modal-footer">
+          <v-btn @click="SubmitCsv()"
+                    color="success"> Submit </v-btn>
+        </div>
+      </div>
+
+      </div>
     </div>
+   
+    
 </template>
 <script>
 import * as bulmaToast from 'bulma-toast'
@@ -180,6 +265,9 @@ export default {
         ])
     },
     data: () => ({
+      isModalVisible: false, 
+      importedData:[],
+      importedHeader:[],
       errors:"",
         emailRules: [ 
         v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
@@ -233,6 +321,98 @@ export default {
 
 
     methods: {
+      importCsv(){
+        let self = this;
+        var file = document.getElementById('UploadFile').files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const contents = e.target.result;
+                const lines = contents.split("\n");
+
+                // Assuming the first row contains headers
+                const headers = lines[0].split(",");
+                self.importedHeader =headers;
+
+                const data = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                  if (lines[i]!=''){
+                    const values = lines[i].split(",");
+                    
+                    const entry = {};
+
+
+                    for (let j = 0; j < headers.length; j++) {
+                        entry[headers[j].trim().toLowerCase()] = values[j].trim();
+                    }
+                    self.importedData.push(entry);
+                  }
+                }
+                // console.log(data);
+                // this.importedData = data;
+         
+
+                // Display the parsed CSV data
+               // csvDataDisplay.textContent = JSON.stringify(data, null, 2);
+            };
+
+         reader.readAsText(file);
+
+        }
+        // console.log(this.importedData);
+
+      },
+      showModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+
+      },
+      SubmitCsv(){
+        let formData = this.importedData;
+        console.log(formData);
+
+      },
+      closeModal() {
+        this.importedData = [];
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+      },
+      async downloadSample(){
+        await axios.get('api/get/sample-song/').then(response=>{
+            var data = response.data;
+            var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+
+                var link = document.createElement('a');
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'artistsample.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            // this.UserData = response.data.data
+        }).catch(error=>{
+            console.log(error)
+        });
+      },
+      
+     getCSV(jsonData) {
+     
+      const arr = typeof jsonData !== 'object' ? JSON.parse(jsonData) : jsonData;
+    const str = `${Object.keys(arr[0]).map((value) => `${value}`).join(',')}\r\n`;
+    const csvContent = arr.reduce((st, next) => {
+      st += `${Object.values(next).map((value) => 
+        `${value}`).join(',')}\r\n`;
+         return st;
+      }, str);
+    const element = document.createElement('a');
+    element.href = `data:text/csv;charset=utf8,${encodeURI(csvContent)}`;
+    element.target = '_blank';
+    element.download = 'artist.csv';
+    element.click();    
+},
         async validate () {
         
       },

@@ -278,39 +278,40 @@
     <div id="myModal" class="modal" >
 
 <!-- Modal content -->
-<div class="modal-content">
-  <span @click="closeModal" class="close mr-5">&times;</span>
-  <div class="modal-header">
-    
-    <h2>Import Csv File</h2>
-  </div>
-  
-  <div class="modal-body">
-    <input type="file" id="UploadFile" accept=".csv"/>
-    <v-btn @click="downloadSample">Download</v-btn>
-    <v-btn @click="importCsv()"
-              color="success"> Preview data </v-btn>
-              <div v-if="importedData.length>0">
-                <table :style="'width:90%'" class="mt-5" >
-                  <tr>
-                    <th :style="'border:1px solid black;'" v-for="(item,index) in importedHeader" :key="index" >{{ item }}</th>
-                  </tr>
-                  <tr v-for="(item,index) in importedData" :key="index" >
-                    <td :style="'border:1px solid black;'">{{item.name}}</td>
-                    <td :style="'border:1px solid black;'">{{item.age}}</td>
-                    <td :style="'border:1px solid black;'">{{item.grade}}</td>
+      <div class="modal-content">
+        <span @click="closeModal" class="close mr-5">&times;</span>
+        
+        <div class="modal-header">
+          
+          <h2>Import Csv File  <v-btn class="ml-10" @click="downloadSample">Download sample</v-btn></h2>
+        </div>
+        
+        <div class="modal-body">
+          <input type="file" id="UploadFile" accept=".csv"/>
+          
+          <v-btn @click="importCsv()"
+                    color="success"> Preview data </v-btn>
+                    <div v-if="importedData.length>0">
+                      <table :style="'width:90%'" class="mt-5" >
+                        <tr>
+                          <th :style="'border:1px solid black;'" v-for="(item,index) in importedHeader" :key="index" >{{ item }}</th>
+                        </tr>
+                        <tr v-for="(item,index) in importedData" :key="index" >
+                          <td :style="'border:1px solid black;'">{{item.name}}</td>
+                          <td :style="'border:1px solid black;'">{{item.age}}</td>
+                          <td :style="'border:1px solid black;'">{{item.grade}}</td>
 
-                  </tr>
-                  
-                </table>
+                        </tr>
+                        
+                      </table>
 
-              </div>
-  </div>
-  <div class="modal-footer">
-    <v-btn @click="SubmitCsv()"
-              color="success"> Submit </v-btn>
-  </div>
-</div>
+                    </div>
+        </div>
+        <div class="modal-footer">
+          <v-btn @click="SubmitCsv()"
+                    color="success"> Submit </v-btn>
+        </div>
+      </div>
 
 </div>
     </div>
@@ -501,14 +502,23 @@ export default {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
       },
-      downloadSample(){
-        const link = document.createElement("a");
-        const public_path =process.env.BASE_URL; 
-        const path = public_path+'public/sampleartist.csv';
-        console.log(path);
-link.href = path;
-link.setAttribute("download", "sample.csv");
-link.click();
+      async downloadSample(){
+        await axios.get('api/get/sample-artist/').then(response=>{
+            var data = response.data;
+            var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+
+                var link = document.createElement('a');
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'artistsample.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            // this.UserData = response.data.data
+        }).catch(error=>{
+            console.log(error)
+        });
       },
       
      getCSV(jsonData) {
