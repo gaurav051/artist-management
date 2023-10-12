@@ -78,7 +78,7 @@ export default {
             album_name:this.album_name,
             genre:this.genre,
             }
-            axios.post('/api/create/songs-list/'+this.$route.params.id+'/', formData).then(response=>{
+            axios.post('/api/create/songs-list/', formData).then(response=>{
                 bulmaToast.toast({ message: 'Song Added Successfully' })
                 this.$router.push({
           name:"songs",params:{id:this.$route.params.id}

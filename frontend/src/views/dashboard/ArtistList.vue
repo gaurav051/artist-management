@@ -28,7 +28,7 @@
       >
         
       </v-icon> -->
-        <v-btn @click="getCSV(UserData)"
+        <v-btn @click="getCSV(UserData)" v-if="getCurrentUser.role_type == 'artist manager'"
               color="success"> <v-tooltip
         activator="parent"
         location="start"
@@ -41,7 +41,7 @@
         
       </v-icon> </v-btn>
         
-              <v-btn @click="showModal">  <v-tooltip
+              <v-btn @click="showModal" v-if="getCurrentUser.role_type == 'artist manager'">  <v-tooltip
         activator="parent"
         location="end"
       >Upload csv</v-tooltip><v-icon
@@ -252,7 +252,7 @@
         
       </v-icon>
     </v-btn>
-  <v-btn @click="deleteItem(item)">
+  <v-btn @click="deleteItem(item)" v-if="getCurrentUser.role_type == 'artist manager'">
     <v-tooltip
         activator="parent"
         location="end"
@@ -297,9 +297,15 @@
                           <th :style="'border:1px solid black;'" v-for="(item,index) in importedHeader" :key="index" >{{ item }}</th>
                         </tr>
                         <tr v-for="(item,index) in importedData" :key="index" >
-                          <td :style="'border:1px solid black;'">{{item.name}}</td>
-                          <td :style="'border:1px solid black;'">{{item.age}}</td>
-                          <td :style="'border:1px solid black;'">{{item.grade}}</td>
+                          <td :style="'border:1px solid black;'">{{item.email}}</td>
+                          <td :style="'border:1px solid black;'">{{item.first_name}}</td>
+                          <td :style="'border:1px solid black;'">{{item.last_name}}</td>
+                          <td :style="'border:1px solid black;'">{{item.dob}}</td>
+                          <td :style="'border:1px solid black;'">{{item.gender}}</td>
+                          <td :style="'border:1px solid black;'">{{item.address}}</td>
+                          <td :style="'border:1px solid black;'">{{item.phone}}</td>
+                          <td :style="'border:1px solid black;'">{{item.first_release_year}}</td>
+                          <td :style="'border:1px solid black;'">{{item.no_of_albums_releases}}</td>
 
                         </tr>
                         
@@ -420,7 +426,7 @@ export default {
       },
       songItem(item){
         this.$router.push({
-          name:"songs",params:{id:item.id}
+          name:"songs",query:{id:item.id}
         })
       },
       deleteItem (item) {
@@ -458,20 +464,14 @@ export default {
             reader.onload = function (e) {
                 const contents = e.target.result;
                 const lines = contents.split("\n");
-
                 // Assuming the first row contains headers
                 const headers = lines[0].split(",");
                 self.importedHeader =headers;
-
                 const data = [];
-
                 for (let i = 1; i < lines.length; i++) {
                   if (lines[i]!=''){
                     const values = lines[i].split(",");
-                    
                     const entry = {};
-
-
                     for (let j = 0; j < headers.length; j++) {
                         entry[headers[j].trim().toLowerCase()] = values[j].trim();
                     }
@@ -549,6 +549,7 @@ export default {
                 axios.post('/api/update/artist/'+this.editedItem.id+'/', this.editedItem).then(response=>{
                 bulmaToast.toast({ message: 'User successfully updated' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
+                this.initialize()
 
                     this.close();
         }).catch(error=>{

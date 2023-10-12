@@ -83,21 +83,12 @@ class GetUserList(APIView):
 	def get(self,request):
 		if request.user.role_type == 'super admin':
 			cursor = connection.cursor()
-			cursor.execute("select email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in ('super admin','artist manager','artist') and id!=%s",[str(request.user.id),])
+			cursor.execute("select id, email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in ('super admin','artist manager','artist') and id!=%s",[str(request.user.id),])
 			data = dictfetchall(cursor)
-
-			# users = User.objects.raw(query)
-			# users = User.objects.filter(role_type__in=['super admin','artist manager','artist']).exclude(id=request.user.id)
-			# serilizer= UserDataSerilizer(users, many=True)
-			# data = serilizer.data
 		elif request.user.role_type == 'artist manager':
 			cursor = connection.cursor()
-			cursor.exceute("select email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in (,'artist manager','artist') and id!=%s",[str(request.user.id),])
+			cursor.exceute("select id, email, role_type, first_name, last_name, phone, dob,gender,address from user where role_type in (,'artist manager','artist') and id!=%s",[str(request.user.id),])
 			data = dictfetchall(cursor)
-			# users = User.objects.raw(query)
-			# users = User.objects.filter(role_type__in=['artist manager','artist']).exclude(id=request.user.id)
-			# serilizer= UserDataSerilizer(users, many=True)
-			# data = serilizer.data
 		else:
 			data=[]
 		return Response({"data":data},status=status.HTTP_200_OK)
@@ -112,8 +103,6 @@ class UpdateUser(APIView):
 		if serilizer.is_valid():
 			data = request.data
 			cursor = connection.cursor()
-			# [data['first_name'], data["last_name"], data["dob"], +data["gender"], data["phone"], data["address"], str(pk)]
-			# user_query = 'update user set first_name="'+data['first_name']+'",last_name="'+data["last_name"]+'",dob="'+data["dob"]+'",gender="'+data["gender"] +'",phone="'+data["phone"]+'",address="'+data["address"]+'" where id ="'+str(pk)+'";'
 			user_query = 'update user set first_name=%s,last_name=%s,dob=%s,gender=%s,phone=%s,address=%s where id =%s;'
 
 			cursor.execute(user_query,[data['first_name'],data["last_name"],data["dob"],data["gender"],data["phone"],data["address"],str(pk)] )
@@ -125,17 +114,12 @@ class CreateUser(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 
 	def post(self,request):
-		# if request.user.role_type == 'super admin':
-		# users = User.objects.get(id=pk)
 		data = request.data
 		serilizer= UserCreateSerializer(data = data)
 		if serilizer.is_valid():
 			now = datetime.datetime.now()
-			
 			password = make_password(data['password'])
 			cursor = connection.cursor()
-
-			
 			query = 'insert into user (email, password, dob,is_superuser,is_staff,is_active, first_name, last_name, address, phone, gender, role_type,created_at, updated_at) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
 			cursor.execute(query,[data["email"], str(password),data["dob"], "0","0","1",data["first_name"],data["last_name"],data["address"],data["phone"],data["gender"],data["role_type"],str(now),str(now)])
 			return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)

@@ -34,6 +34,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Gender"
+                        :error-messages="errors?errors?.gender?.length?errors.gender[0]:'':''"
                     ></v-select>
                 </v-col>
     
@@ -46,6 +47,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Role"
+                        :error-messages="errors?errors?.role_type?.length?errors.role_type[0]:'':''"
                     ></v-select>
                 </v-col>
                 <v-col>  

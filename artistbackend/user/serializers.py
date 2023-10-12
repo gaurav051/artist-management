@@ -10,6 +10,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 		fields = ('first_name','last_name','email','password','gender','dob','phone','address')
 
 class UserCreateSerializer(serializers.ModelSerializer):
+	role_type = serializers.CharField(required=True)
+	gender = serializers.CharField(required=True)
 	class Meta:
 		model = UserModel
 		fields = ('first_name','last_name','email','password','gender','dob','phone','address','password','role_type')

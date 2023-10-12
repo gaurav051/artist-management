@@ -17,7 +17,7 @@
                     <div class="buttons" v-else>
                         <router-link to="/artist" class="button is-success" v-if="getCurrentUser.role_type == 'super admin' || getCurrentUser.role_type == 'artist manager'"><string>Artist</string></router-link>
                         <router-link to="/users" class="button is-success" v-if="getCurrentUser.role_type == 'super admin'"><string>Users</string></router-link>
-                        <router-link to="/users" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"><string>Songs</string></router-link>
+                        <router-link to="/music" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"><string>Songs</string></router-link>
 
 <button @click="logout" class="button is-danger"><strong>Logout</strong></button>
 </div>

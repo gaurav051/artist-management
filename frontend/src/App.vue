@@ -29,3 +29,10 @@ export default {
 <style lang="scss">
 @import '../node_modules/bulma';
 </style>
+
+<style lang="scss">
+.container{
+  margin-top:2rem;
+}
+</style>
+

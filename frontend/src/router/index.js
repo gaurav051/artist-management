@@ -66,15 +66,16 @@ const routes = [
     }
   },
   {
-    path: '/music/:id',
+    path: '/music',
     name: 'songs',
     component: SongList,
     meta:{
       requireLogin:true
     }
+    
   },
   {
-    path: '/add-music/:id',
+    path: '/add-music/',
     name: 'add.song',
     component: AddSong,
     meta:{
