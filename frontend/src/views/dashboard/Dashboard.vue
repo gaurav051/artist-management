@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="column is-multiline">
-            <h1 class="title"> Dashboard {{ getCurrentUser }}</h1>
+            <h1 class="title"> Dashboard</h1>
         </div>
     </div>
 </template>

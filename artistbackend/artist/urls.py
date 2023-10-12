@@ -17,6 +17,13 @@ urlpatterns = [
     path('get/songs/', views.GetSelfSongList.as_view()),
     path('get/sample-artist/', views.GetSampleArtistFile.as_view()),
     path('get/sample-song/', views.GetSampleSongFile.as_view()),
-    path('song/bulk-create/<int:pk>/', views.SongBulkUpdate.as_view()),
+    path('song/bulk-create/', views.SongBulkUpdate.as_view()),
+
+    path('delete/artist/', views.DeleteArtist.as_view()),
+    path('delete/song/', views.DeleteSong.as_view()),
+
+    
+
+    
 
 ]

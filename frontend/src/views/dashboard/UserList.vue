@@ -19,29 +19,13 @@
         ></v-divider>
         
         <v-spacer></v-spacer>
-        <router-link to="/add-user" class="button is-success"> <v-btn
-              color="primary"> Add User </v-btn></router-link>
+        <router-link to="/add-user" class="button is-success mr-2"> <v-btn
+              > Add User </v-btn></router-link>
         <v-dialog
           v-model="dialog"
           max-width="500px"
         >
-       
-       
-  
-          <!-- <template v-slot:activator="{ props }">
-            
-            <v-btn
-              color="primary"
-              dark
-              class="mb-2"
-              v-bind="props"
-            >
-              Add User
-            </v-btn>
-          </template> -->
           <v-card>
-           
-
             <v-card-text>
               <v-container>
                 <v-form ref="form">
@@ -229,7 +213,6 @@ export default {
             roleItems:[
                     { name: 'Super Admin', code: 'super admin' },
                     { name: 'Artist Manager', code: 'artist manager' },
-                    { name: 'Artist', code: 'artist' },
 
             ],
       dialog: false,
@@ -303,8 +286,18 @@ export default {
         this.dialogDelete = true
       },
       deleteItemConfirm () {
-        this.UserData.splice(this.editedIndex, 1)
-        this.closeDelete()
+        var data = {id:this.editedItem.id} 
+        console.log(data)
+        axios.post('/api/delete/user/', data).then(response=>{
+                bulmaToast.toast({ message: 'User successfully deleted',type:'is-success',position: 'bottom-right' })
+                this.UserData.splice(this.editedIndex, 1)
+
+                this.closeDelete()
+        }).catch(error=>{
+          bulmaToast.toast({ message: 'Something went wrong',type:'is-danger',position: 'bottom-right' })
+        });
+       
+        
       },
       close () {
         this.errors ="";
@@ -332,7 +325,7 @@ export default {
             }
             else{
                 axios.post('/api/update/user/'+this.editedItem.id+'/', this.editedItem).then(response=>{
-                bulmaToast.toast({ message: 'User successfully updated' })
+                bulmaToast.toast({ message: 'User successfully updated',type:'is-success',position: 'bottom-right' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
 
                     this.close();

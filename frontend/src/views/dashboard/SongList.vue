@@ -44,7 +44,7 @@
         
       </v-icon></v-btn>
         <router-link :to="{name:'add.song'}" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"> <v-btn
-              color="primary"> Add Songs </v-btn></router-link>
+             > Add Songs </v-btn></router-link>
         <v-dialog
           v-model="dialog"
           max-width="500px"
@@ -405,7 +405,7 @@ export default {
                 
             }
             else{
-              axios.post('/api/song/bulk-create/'+this.$route.params.id+'/', formData)
+              axios.post('/api/song/bulk-create/', formData)
               .then(response=>{
                 console.log(response);
                 this.closeModal();
@@ -503,8 +503,16 @@ export default {
         this.dialogDelete = true
       },
       deleteItemConfirm () {
-        this.UserData.splice(this.editedIndex, 1)
-        this.closeDelete()
+        var data = {id:this.editedItem.id} 
+        console.log(data)
+        axios.post('/api/delete/song/', data).then(response=>{
+                bulmaToast.toast({ message: 'Songs successfully deleted',type:'is-success',position: 'bottom-right' })
+                this.UserData.splice(this.editedIndex, 1)
+
+                this.closeDelete()
+        }).catch(error=>{
+          bulmaToast.toast({ message: 'Something went wrong',type:'is-danger',position: 'bottom-right' })
+        });
       },
       close () {
         this.dialog = false
@@ -533,7 +541,7 @@ export default {
             else{
                
                 axios.post('/api/update/song/'+this.editedItem.id+'/', this.editedItem).then(response=>{
-                bulmaToast.toast({ message: 'User successfully updated' })
+                bulmaToast.toast({ message: 'User successfully updated',type:'is-success',position: 'bottom-right' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
 
                     this.close();

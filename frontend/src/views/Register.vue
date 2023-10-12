@@ -149,7 +149,7 @@ export default {
                 address: this.address
             }
             axios.post('/api/register', formData).then(response=>{
-                bulmaToast.toast({ message: 'Successfullt registered' })
+                bulmaToast.toast({ message: 'Successfullt registered',type:'is-success',position: 'bottom-right' })
                 this.$router.push('/login')
                 
 

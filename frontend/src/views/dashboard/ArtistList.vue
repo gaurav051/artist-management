@@ -28,32 +28,32 @@
       >
         
       </v-icon> -->
-        <v-btn @click="getCSV(UserData)" v-if="getCurrentUser.role_type == 'artist manager'"
+        <!-- <v-btn @click="getCSV(UserData)" v-if="getCurrentUser.role_type == 'artist manager'"
               color="success"> <v-tooltip
-        activator="parent"
-        location="start"
-      >Download csv</v-tooltip>  <v-icon
-        size="large"
-        class="me-2"
-        
-        icon="mdi-download"
-      >
-        
-      </v-icon> </v-btn>
-        
+                activator="parent"
+                location="start"
+              >Download csv</v-tooltip>  <v-icon
+                size="large"
+                class="me-2"
+                
+                icon="mdi-download"
+              >
+                
+              </v-icon> </v-btn> -->
+<!--         
               <v-btn @click="showModal" v-if="getCurrentUser.role_type == 'artist manager'">  <v-tooltip
-        activator="parent"
-        location="end"
-      >Upload csv</v-tooltip><v-icon
-        size="large"
-        class="me-2"
-       
-        icon="mdi-upload"
-      >
-        
-      </v-icon></v-btn>
+                  activator="parent"
+                  location="end"
+                >Upload csv</v-tooltip><v-icon
+                  size="large"
+                  class="me-2"
+                
+                  icon="mdi-upload"
+                >
+                  
+                </v-icon></v-btn> -->
       <router-link to="/add-artist" class="button is-success" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
-              color="primary"> Add Artist</v-btn></router-link>
+              > Add Artist</v-btn></router-link>
               
               <!-- <v-btn @click="importCsv()"
               color="success"> Submit </v-btn> -->
@@ -435,8 +435,15 @@ export default {
         this.dialogDelete = true
       },
       deleteItemConfirm () {
-        this.UserData.splice(this.editedIndex, 1)
-        this.closeDelete()
+        var data = {id:this.editedItem.id} 
+        console.log(data)
+        axios.post('/api/delete/artist/', data).then(response=>{
+                bulmaToast.toast({ message: 'Artist successfully deleted',  type: 'is-success',position: 'bottom-right' })
+                this.UserData.splice(this.editedIndex, 1)
+                this.closeDelete()
+        }).catch(error=>{
+          bulmaToast.toast({ message: 'Something went wrong',type:'is-danger',position: 'bottom-right' })
+        });
       },
       close () {
         this.dialog = false
@@ -547,7 +554,8 @@ export default {
             }
             else{
                 axios.post('/api/update/artist/'+this.editedItem.id+'/', this.editedItem).then(response=>{
-                bulmaToast.toast({ message: 'User successfully updated' })
+                bulmaToast.toast({ message: 'Artist successfully updated',
+  type: 'is-success',position: 'bottom-right' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
                 this.initialize()
 

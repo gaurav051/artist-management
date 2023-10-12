@@ -85,6 +85,19 @@ class CreateArtist(APIView):
 		else:
 			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteArtist(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+
+	def post(self,request):
+		artist_id = request.data["id"]
+		cursor = connection.cursor()
+		query = "Delete from music where artist_id="+str(artist_id)+";"
+		cursor.execute(query)
+		query = "Delete from artist where id="+str(artist_id)+";"
+		
+		cursor.execute(query)
+		return Response({"message":"Data deleted successfully"},status=status.HTTP_200_OK)
+
 
 class GetSongList(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
@@ -205,14 +218,32 @@ class GetSampleSongFile(APIView):
 
 class SongBulkUpdate(APIView):
 	permissions_classes =  (permissions.IsAuthenticated,)
-	def post(self,request, pk):
+	def post(self,request):
 		try:
 			now = datetime.datetime.now()
-			data = request.data
 			cursor = connection.cursor()
+			data = request.data
+			print(request.user.id)
+			artist = "select * from artist where user_id="+str(request.user.id)+" limit 1;"
+			cursor.execute(artist)
+			# data = cursor.fetchone()
+			artist_data = namedtuplefetchall(cursor)
+			artist_id = artist_data[0].id
+			print(artist_id)
+			
 			for i in data:
-				cursor.execute("Insert into music (title,genre,album_name, artist_id, created_at,updated_at) VALUES (%s,%s,%s,%s,%s,%s)",[i["title"],i["album_name"],i["genre"],str(pk),str(now), str(now)])
-			return Response({"meaasge":"data updated successfully"})
+				cursor.execute("Insert into music (title,genre,album_name, artist_id, created_at,updated_at) VALUES (%s,%s,%s,%s,%s,%s)",[i["title"],i["album_name"],i["genre"],str(artist_id),str(now), str(now)])
+			return Response({"message":"data updated successfully"})
 		except Exception as e:
 			return Response({"data":str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteSong(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+
+	def post(self,request):
+		user_id = request.data["id"]
+		query = "Delete from music where id="+str(user_id)+";"
+		cursor = connection.cursor()
+		cursor.execute(query)
+		return Response({"message":"Data deleted successfully"},status=status.HTTP_200_OK)
 

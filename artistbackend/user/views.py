@@ -126,4 +126,27 @@ class CreateUser(APIView):
 		else:
 			return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteUser(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+
+	def post(self,request):
+		user_id = request.data["id"]
+		cursor = connection.cursor()
+		cursor.execute("delete from music where id in (select m.id from music m inner join artist a on a.id=m.artist_id inner join user u on u.id=a.user_id where u.id =" + str(user_id) +")")
+		cursor.execute("delete from artist where id in (select a.id from artist a inner join user u on u.id=a.user_id where u.id = " + str(user_id)+")")
+		query = "Delete from user where id="+str(user_id)
+		cursor.execute(query)
+		return Response({"message":"Data deleted successfully"},status=status.HTTP_200_OK)
+		# data = request.data
+		# serilizer= UserCreateSerializer(data = data)
+		# if serilizer.is_valid():
+		# 	now = datetime.datetime.now()
+		# 	password = make_password(data['password'])
+		# 	cursor = connection.cursor()
+		# 	query = 'insert into user (email, password, dob,is_superuser,is_staff,is_active, first_name, last_name, address, phone, gender, role_type,created_at, updated_at) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
+		# 	cursor.execute(query,[data["email"], str(password),data["dob"], "0","0","1",data["first_name"],data["last_name"],data["address"],data["phone"],data["gender"],data["role_type"],str(now),str(now)])
+		# 	return Response({"message":"Data updated successfully"},status=status.HTTP_200_OK)
+		# else:
+		# 	return Response({"data":serilizer.errors},status=status.HTTP_400_BAD_REQUEST)
+
 

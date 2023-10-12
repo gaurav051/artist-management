@@ -233,8 +233,6 @@ export default {
             roleItems:[
                     { name: 'Super Admin', code: 'super admin' },
                     { name: 'Artist Manager', code: 'artist manager' },
-                    { name: 'Artist', code: 'artist' },
-
             ]
         }
     },
@@ -253,7 +251,7 @@ export default {
                 address: this.address
             }
             axios.post('/api/add/user/', formData).then(response=>{
-                bulmaToast.toast({ message: 'Successfullt registered' })
+                bulmaToast.toast({ message: 'Successfullt registered' ,type:'is-success',position: 'bottom-right'})
                 this.$router.push('/users')
                 
 

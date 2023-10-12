@@ -54,6 +54,7 @@
 </template>
 <script>
 import axios from 'axios'
+import * as bulmaToast from 'bulma-toast'
 
 
 export default {
@@ -93,6 +94,7 @@ export default {
                 this.$store.commit('setToken', token)
                 axios.defaults.headers.common['Authorization'] = 'Bearer '+ token
                 localStorage.setItem('token', token)
+                bulmaToast.toast({ message: 'Login success',type:'is-success',position: 'bottom-right' })
                 this.$router.push('/')
 
             }).catch(error=>{
