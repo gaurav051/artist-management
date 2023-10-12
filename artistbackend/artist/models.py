@@ -10,6 +10,7 @@ class Artist(models.Model):
     first_release_year = models.SmallIntegerField()
     no_of_albums_releases = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

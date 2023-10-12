@@ -18,9 +18,45 @@
           vertical
         ></v-divider>
         
+        
         <v-spacer></v-spacer>
-        <router-link to="/add-artist" class="button is-success"> <v-btn
-              color="primary"> Add Artist </v-btn></router-link>
+        <!-- <v-icon
+        size="large"
+        class="me-2"
+        @click="getCSV(UserData)"
+        icon="mdi-excel"
+      >
+        
+      </v-icon> -->
+        <!-- <v-btn @click="getCSV(UserData)" v-if="getCurrentUser.role_type == 'artist manager'"
+              color="success"> <v-tooltip
+                activator="parent"
+                location="start"
+              >Download csv</v-tooltip>  <v-icon
+                size="large"
+                class="me-2"
+                
+                icon="mdi-download"
+              >
+                
+              </v-icon> </v-btn> -->
+<!--         
+              <v-btn @click="showModal" v-if="getCurrentUser.role_type == 'artist manager'">  <v-tooltip
+                  activator="parent"
+                  location="end"
+                >Upload csv</v-tooltip><v-icon
+                  size="large"
+                  class="me-2"
+                
+                  icon="mdi-upload"
+                >
+                  
+                </v-icon></v-btn> -->
+      <router-link to="/add-artist" class="button is-success" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
+              > Add Artist</v-btn></router-link>
+              
+              <!-- <v-btn @click="importCsv()"
+              color="success"> Submit </v-btn> -->
         <v-dialog
           v-model="dialog"
           max-width="500px"
@@ -44,6 +80,7 @@
 
             <v-card-text>
               <v-container>
+                <!-- <pre id="csvData"></pre> -->
                 <v-form ref="form">
                 <v-row>
                   <v-col
@@ -184,30 +221,50 @@
         </v-dialog>
       </v-toolbar>
     </template>
+  
+
     <template v-slot:item.actions="{ item }">
+      <v-btn  @click="songItem(item)">
+        <v-tooltip
+        activator="parent"
+        location="start"
+      >Songs</v-tooltip>
       <v-icon
         size="small"
         class="me-2"
-        @click="songItem(item)"
+       
         icon="mdi-music"
-      >
+      > 
         
       </v-icon>
-      <v-icon
+    </v-btn>
+      <v-btn  @click="editItem(item) " v-if="getCurrentUser.role_type == 'artist manager'">
+        <v-tooltip
+        activator="parent"
+        location="bottom"
+      >Edit</v-tooltip>
+      <v-icon 
         size="small"
         class="me-2"
-        @click="editItem(item)"
         icon="mdi-pencil"
       >
+     
         
       </v-icon>
+    </v-btn>
+  <v-btn @click="deleteItem(item)" v-if="getCurrentUser.role_type == 'artist manager'">
+    <v-tooltip
+        activator="parent"
+        location="end"
+      >Delete</v-tooltip>
       <v-icon
         size="small"
-        @click="deleteItem(item)"
+        
         icon="mdi-delete"
       >
-        
+    
       </v-icon>
+      </v-btn>
     </template>
     <template v-slot:no-data>
       <v-btn
@@ -218,15 +275,73 @@
       </v-btn>
     </template>
     </v-data-table>
+    <div id="myModal" class="modal" >
+
+<!-- Modal content -->
+      <div class="modal-content">
+        <span @click="closeModal" class="close mr-5">&times;</span>
+        
+        <div class="modal-header">
+          
+          <h2>Import Csv File  <v-btn class="ml-10" @click="downloadSample">Download sample</v-btn></h2>
+        </div>
+        
+        <div class="modal-body">
+          <input type="file" id="UploadFile" accept=".csv"/>
+          
+          <v-btn @click="importCsv()"
+                    color="success"> Preview data </v-btn>
+                    <div v-if="importedData.length>0">
+                      <table :style="'width:90%'" class="mt-5" >
+                        <tr>
+                          <th :style="'border:1px solid black;'" v-for="(item,index) in importedHeader" :key="index" >{{ item }}</th>
+                        </tr>
+                        <tr v-for="(item,index) in importedData" :key="index" >
+                          <td :style="'border:1px solid black;'">{{item.email}}</td>
+                          <td :style="'border:1px solid black;'">{{item.first_name}}</td>
+                          <td :style="'border:1px solid black;'">{{item.last_name}}</td>
+                          <td :style="'border:1px solid black;'">{{item.dob}}</td>
+                          <td :style="'border:1px solid black;'">{{item.gender}}</td>
+                          <td :style="'border:1px solid black;'">{{item.address}}</td>
+                          <td :style="'border:1px solid black;'">{{item.phone}}</td>
+                          <td :style="'border:1px solid black;'">{{item.first_release_year}}</td>
+                          <td :style="'border:1px solid black;'">{{item.no_of_albums_releases}}</td>
+
+                        </tr>
+                        
+                      </table>
+
+                    </div>
+        </div>
+        <div class="modal-footer">
+          <v-btn @click="SubmitCsv()"
+                    color="success"> Submit </v-btn>
+        </div>
+      </div>
+
+</div>
     </div>
+    
 </template>
 <script>
+
+import { mapGetters } from 'vuex';
 import * as bulmaToast from 'bulma-toast'
 import axios from 'axios';
 import { VDataTable } from 'vuetify/labs/VDataTable'
 export default {
     name:'UserList',
+    computed:{
+      
+        ...mapGetters([
+            'getIsAuthenticated',
+            'getCurrentUser'
+        ])
+    },
     data: () => ({
+      isModalVisible: false, 
+      importedData:[],
+      importedHeader:[],
         emailRules: [ 
         v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
         v => !!v || 'This field is required',
@@ -244,9 +359,11 @@ export default {
       dialogDelete: false,
       headers: [
        
-        { title: 'Email', key: 'email' },
-        { title: 'First Name', key: 'first_name' },
-        { title: 'Last Name', key: 'last_name' },
+        { title: 'Name', key: 'name' },
+        { title: 'Date of Birth', key: 'dob' },
+        { title: 'Address', key: 'address' },
+        { title: 'No of Album Released', key: 'no_of_albums_releases' },
+        { title: 'First Release Year', key: 'first_release_year' },
         
         { title: 'Actions', key: 'actions', sortable: false },
       ],
@@ -309,7 +426,7 @@ export default {
       },
       songItem(item){
         this.$router.push({
-          name:"songs",params:{id:item.id}
+          name:"songs",query:{id:item.id}
         })
       },
       deleteItem (item) {
@@ -318,8 +435,15 @@ export default {
         this.dialogDelete = true
       },
       deleteItemConfirm () {
-        this.UserData.splice(this.editedIndex, 1)
-        this.closeDelete()
+        var data = {id:this.editedItem.id} 
+        console.log(data)
+        axios.post('/api/delete/artist/', data).then(response=>{
+                bulmaToast.toast({ message: 'Artist successfully deleted',  type: 'is-success',position: 'bottom-right' })
+                this.UserData.splice(this.editedIndex, 1)
+                this.closeDelete()
+        }).catch(error=>{
+          bulmaToast.toast({ message: 'Something went wrong',type:'is-danger',position: 'bottom-right' })
+        });
       },
       close () {
         this.dialog = false
@@ -334,7 +458,91 @@ export default {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
+      },SubmitCsv(){
+        let formData = this.importedData;
+
       },
+      importCsv(){
+        let self = this;
+        var file = document.getElementById('UploadFile').files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const contents = e.target.result;
+                const lines = contents.split("\n");
+                // Assuming the first row contains headers
+                const headers = lines[0].split(",");
+                self.importedHeader =headers;
+                const data = [];
+                for (let i = 1; i < lines.length; i++) {
+                  if (lines[i]!=''){
+                    const values = lines[i].split(",");
+                    const entry = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        entry[headers[j].trim().toLowerCase()] = values[j].trim();
+                    }
+                    self.importedData.push(entry);
+                  }
+                }
+                // console.log(data);
+                // this.importedData = data;
+         
+
+                // Display the parsed CSV data
+               // csvDataDisplay.textContent = JSON.stringify(data, null, 2);
+            };
+
+         reader.readAsText(file);
+
+        }
+        // console.log(this.importedData);
+
+      },
+      showModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+
+      },
+      closeModal() {
+        this.importedData = [];
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+      },
+      async downloadSample(){
+        await axios.get('api/get/sample-artist/').then(response=>{
+            var data = response.data;
+            var blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+
+                var link = document.createElement('a');
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'artistsample.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            // this.UserData = response.data.data
+        }).catch(error=>{
+            console.log(error)
+        });
+      },
+      
+     getCSV(jsonData) {
+     
+      const arr = typeof jsonData !== 'object' ? JSON.parse(jsonData) : jsonData;
+    const str = `${Object.keys(arr[0]).map((value) => `${value}`).join(',')}\r\n`;
+    const csvContent = arr.reduce((st, next) => {
+      st += `${Object.values(next).map((value) => 
+        `${value}`).join(',')}\r\n`;
+         return st;
+      }, str);
+    const element = document.createElement('a');
+    element.href = `data:text/csv;charset=utf8,${encodeURI(csvContent)}`;
+    element.target = '_blank';
+    element.download = 'artist.csv';
+    element.click();    
+},
       async save () {
         if (this.editedIndex > -1) {
             const {valid}  = await this.$refs.form.validate();
@@ -346,8 +554,10 @@ export default {
             }
             else{
                 axios.post('/api/update/artist/'+this.editedItem.id+'/', this.editedItem).then(response=>{
-                bulmaToast.toast({ message: 'User successfully updated' })
+                bulmaToast.toast({ message: 'Artist successfully updated',
+  type: 'is-success',position: 'bottom-right' })
                 Object.assign(this.UserData[this.editedIndex], this.editedItem);
+                this.initialize()
 
                     this.close();
         }).catch(error=>{
@@ -365,3 +575,74 @@ export default {
     },
 }
 </script>
+<style>
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: #000;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 20px 16px;
+  background-color: rgb(238, 238, 238);
+  color: rgb(0, 0, 0);
+}
+
+.modal-body {padding: 10px 16px;}
+
+.modal-footer {
+  padding: 10px 16px;
+  background-color: rgb(238, 238, 238);
+  color: white;
+}
+</style>

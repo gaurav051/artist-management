@@ -17,12 +17,16 @@ import * as directives from "vuetify/directives";
 
 import { fa } from "vuetify/iconsets/fa";
 import { aliases, mdi } from "vuetify/lib/iconsets/mdi";
+import "vuetify/dist/vuetify.min.css";
 import {VueCsvImportPlugin} from "vue-csv-import";
 // make sure to also import the coresponding css
 import "@mdi/font/css/materialdesignicons.css"; // Ensure you are using css-loader
 
 
-axios.defaults.baseURL='http://10.2.3.197:8005'
+// axios.defaults.baseURL='http://10.2.3.197:8005/'
+axios.defaults.baseURL='http://127.0.0.1:8000/'
+
+
 
 
   const vuetify = createVuetify({

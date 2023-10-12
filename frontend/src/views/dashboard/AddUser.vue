@@ -34,6 +34,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Gender"
+                        :error-messages="errors?errors?.gender?.length?errors.gender[0]:'':''"
                     ></v-select>
                 </v-col>
     
@@ -46,6 +47,7 @@
                         item-title="name"
                         item-value="code"
                         label="Select Role"
+                        :error-messages="errors?errors?.role_type?.length?errors.role_type[0]:'':''"
                     ></v-select>
                 </v-col>
                 <v-col>  
@@ -231,8 +233,6 @@ export default {
             roleItems:[
                     { name: 'Super Admin', code: 'super admin' },
                     { name: 'Artist Manager', code: 'artist manager' },
-                    { name: 'Artist', code: 'artist' },
-
             ]
         }
     },
@@ -251,7 +251,7 @@ export default {
                 address: this.address
             }
             axios.post('/api/add/user/', formData).then(response=>{
-                bulmaToast.toast({ message: 'Successfullt registered' })
+                bulmaToast.toast({ message: 'Successfullt registered' ,type:'is-success',position: 'bottom-right'})
                 this.$router.push('/users')
                 
 

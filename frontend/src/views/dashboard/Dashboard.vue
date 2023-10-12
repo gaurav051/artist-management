@@ -6,7 +6,14 @@
     </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 export default {
-    name:'Dashboard'
+    name:'Dashboard',
+    computed:{
+        ...mapGetters([
+            'getIsAuthenticated',
+            'getCurrentUser'
+        ])
+    },
 }
 </script>

@@ -80,3 +80,41 @@ class MusicCreateSerializer(serializers.Serializer):
     # class Meta:
     #     model = Music
     #     fields = ("id","title","genre","album")
+
+
+class ParamListSerializer(serializers.ListSerializer):
+    def validate(self, attrs):
+        if attrs["genre"] not in (('rnb','country','classic','rock','jazz')):
+            raise serializers.ValidationError({"genre":"Invalid Input for genre"})
+        
+        # if self.instance and email != self.instance.email:
+        # if UserModel.objects.filter(email=email).exists():
+        #     raise serializers.ValidationError("Email already exists")
+        # return email
+            
+
+        # Here attrs contains list of Params You can validate it here
+        # pass
+
+    # def create(self, validated_data):
+    #     books = [Book(**item) for item in validated_data]
+    #     return Book.objects.bulk_create(books)
+
+class ParamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Music
+        fields = ['title', 'genre','album_name']
+        list_serializer_class = ParamListSerializer  # This specifies which list serializer class to user
+        extra_kwargs = {
+            'id': {
+                'required': False,
+            },
+            'name': {
+                'required': False,
+            }
+        }
+
+    # def validate(self, attrs):
+    #     # enter your validations here
+    #     pass

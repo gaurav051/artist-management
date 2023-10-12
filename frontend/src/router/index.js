@@ -10,6 +10,7 @@ import AddSong from '../views/dashboard/AddSong.vue'
 import SongList from '../views/dashboard/SongList.vue'
 import AddUser from '../views/dashboard/AddUser.vue'
 import Dashboard from '../views/dashboard/Dashboard.vue'
+import axios from 'axios'
 
 
 const routes = [
@@ -65,15 +66,16 @@ const routes = [
     }
   },
   {
-    path: '/music/:id',
+    path: '/music',
     name: 'songs',
     component: SongList,
     meta:{
       requireLogin:true
     }
+    
   },
   {
-    path: '/add-music/:id',
+    path: '/add-music/',
     name: 'add.song',
     component: AddSong,
     meta:{
@@ -97,10 +99,24 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next)=>{
-  if(to.matched.some(record=> record.meta.requireLogin)&& !store.state.isAuthenticated){
-    next('login')
+  console.log(to);
+  if(to.matched.some(record=> record.meta.requireLogin)){
+    axios.get('api/user/me').then(data=>{
+      console.log(data.data.user)
+      store.commit('setUser',data.data.user);
+      next();
+
+
+    }).catch(()=>{
+      store.commit('removeToken')
+      next('login')
+    })
+
+
+   
   }
   else{
+   
     next()
   }
 })

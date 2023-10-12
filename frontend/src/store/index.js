@@ -4,12 +4,17 @@ export default createStore({
   state: {
     isLoading: false,
     isAuthenticated:false,
-    token: ''
+    token: '',
+    user:{}
   },
   getters: {
     getIsAuthenticated: (state) =>{
       return state.isAuthenticated
-    }
+    },
+     getCurrentUser: (state)=>{
+      console.log(state.user);
+      return state.user
+    },
 
   },
   mutations: {
@@ -29,6 +34,9 @@ export default createStore({
     setToken(state, token){
       state.token = token
       state.isAuthenticated = true
+    },
+    setUser(state, user){
+      state.user = user
     },
     removeToken(state){
       state.token = ''
