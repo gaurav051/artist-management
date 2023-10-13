@@ -52,7 +52,7 @@
                 >
                   
                 </v-icon></v-btn> -->
-      <router-link to="/add-artist" class="button is-success" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
+      <router-link to="/add-artist" class="button is-success mr-2" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
               > Add Artist</v-btn></router-link>
               
               <!-- <v-btn @click="importCsv()"
@@ -267,11 +267,14 @@
       </v-btn>
     </template>
     <template v-slot:no-data>
+      <div>
+        No records found
+      </div>
       <v-btn
         color="primary"
         @click="initialize"
       >
-        Reset
+        Refresh
       </v-btn>
     </template>
     </v-data-table>

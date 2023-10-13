@@ -180,11 +180,14 @@
       </v-icon>
     </template>
     <template v-slot:no-data>
+      <div>
+        No records found
+      </div>
       <v-btn
         color="primary"
         @click="initialize"
       >
-        Reset
+        Refresh
       </v-btn>
     </template>
     </v-data-table>

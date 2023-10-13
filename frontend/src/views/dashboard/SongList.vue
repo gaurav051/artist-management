@@ -43,7 +43,7 @@
       >
         
       </v-icon></v-btn>
-        <router-link :to="{name:'add.song'}" class="button is-success" v-if="getCurrentUser.role_type == 'artist'"> <v-btn
+        <router-link :to="{name:'add.song'}" class="button is-success mr-2" v-if="getCurrentUser.role_type == 'artist'"> <v-btn
              > Add Songs </v-btn></router-link>
         <v-dialog
           v-model="dialog"
@@ -180,11 +180,14 @@
       </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn
+      <div>
+        No records found
+      </div>
+      <v-btn class="mt-5"
         color="primary"
         @click="initialize"
       >
-        Reset
+        Refresh
       </v-btn>
     </template>
     </v-data-table>
@@ -233,6 +236,16 @@
                         label="Select Genre"
                       
                     ></v-select></td>
+                    <td >  <v-btn size="large" class="ml-5" @click="deleteImportedItem(item)">   <v-tooltip
+                            activator="parent"
+                            location="start"
+                          >Delete</v-tooltip><v-icon 
+                            size="small"
+                            
+                            icon="mdi-delete"
+                            color="red-darken-2"
+                          >
+                          </v-icon></v-btn></td>
 
                         </tr>
                         
@@ -265,7 +278,8 @@ export default {
         ])
     },
     data: () => ({
-      isModalVisible: false, 
+      isModalVisible: false,
+      exportArray:[],
       importedData:[],
       importedHeader:[],
       errors:"",
@@ -467,8 +481,12 @@ export default {
       if(id!=''){
 
         await axios.get('api/get/songs-list/'+id).then(response=>{
-            console.log(response.data.data);
+            // console.log(response.data.data);
             this.UserData = response.data.data
+             this.exportArray = response.data.data.map((item) => {
+              delete item.id
+            return item;
+            });
         }).catch(error=>{
             console.log(error)
         });
@@ -476,7 +494,11 @@ export default {
       else{
         await axios.get('api/get/songs/').then(response=>{
             console.log(response.data.data);
-            this.UserData = response.data.data
+            this.UserData = response.data.data;
+            this.exportArray = response.data.data.map((item) => {
+              delete item.id
+            return item;
+            });
         }).catch(error=>{
             console.log(error)
         });
@@ -502,12 +524,22 @@ export default {
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
+      deleteImportedItem (item) {
+        var index = this.importedData.indexOf(item);
+        console.log(index)
+        // this.editedIndex = this.importedData.indexOf(item)
+        this.importedData.splice(index, 1)
+      },
       deleteItemConfirm () {
         var data = {id:this.editedItem.id} 
         console.log(data)
         axios.post('/api/delete/song/', data).then(response=>{
                 bulmaToast.toast({ message: 'Songs successfully deleted',type:'is-success',position: 'bottom-right' })
-                this.UserData.splice(this.editedIndex, 1)
+                this.UserData.splice(this.editedIndex, 1);
+                this.exportArray = response.data.data.map((item) => {
+              delete item.id
+            return item;
+            });
 
                 this.closeDelete()
         }).catch(error=>{
