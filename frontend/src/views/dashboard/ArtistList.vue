@@ -52,7 +52,7 @@
                 >
                   
                 </v-icon></v-btn> -->
-      <router-link to="/add-artist" class="button is-success" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
+      <router-link to="/add-artist" class="button is-success mr-2" v-if="getCurrentUser.role_type == 'artist manager'"><v-btn
               > Add Artist</v-btn></router-link>
               
               <!-- <v-btn @click="importCsv()"
@@ -267,11 +267,14 @@
       </v-btn>
     </template>
     <template v-slot:no-data>
+      <div>
+        No records found
+      </div>
       <v-btn
         color="primary"
         @click="initialize"
       >
-        Reset
+        Refresh
       </v-btn>
     </template>
     </v-data-table>
@@ -409,7 +412,6 @@ export default {
       async initialize () {
 
         await axios.get('api/get/artist/list/').then(response=>{
-            console.log(response.data.data);
             this.UserData = response.data.data
         }).catch(error=>{
             console.log(error)
@@ -436,7 +438,6 @@ export default {
       },
       deleteItemConfirm () {
         var data = {id:this.editedItem.id} 
-        console.log(data)
         axios.post('/api/delete/artist/', data).then(response=>{
                 bulmaToast.toast({ message: 'Artist successfully deleted',  type: 'is-success',position: 'bottom-right' })
                 this.UserData.splice(this.editedIndex, 1)
@@ -546,7 +547,6 @@ export default {
       async save () {
         if (this.editedIndex > -1) {
             const {valid}  = await this.$refs.form.validate();
-            console.log(valid);
             if (!valid) {
                 return;
                 // this.initialize();

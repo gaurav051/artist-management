@@ -99,10 +99,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next)=>{
-  console.log(to);
   if(to.matched.some(record=> record.meta.requireLogin)){
     axios.get('api/user/me').then(data=>{
-      console.log(data.data.user)
       store.commit('setUser',data.data.user);
       next();
 
