@@ -86,7 +86,7 @@ class GetUserList(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 
 	def get(self,request):
-		if request.user.role_type == 'super admin':
+		if request.user.role_type == 'super admin' or request.user.is_superuser:
 			cursor = connection.cursor()
 			cursor.execute("select id, email, role_type, first_name, last_name, phone, dob,gender,address from user where id!=%s",[str(request.user.id),])
 			data = dictfetchall(cursor)

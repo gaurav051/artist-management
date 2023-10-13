@@ -39,7 +39,7 @@ class GetArtistList(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 
 	def get(self,request):
-		if request.user.role_type == 'super admin' or request.user.role_type == 'artist manager':
+		if request.user.role_type == 'super admin' or request.user.role_type == 'artist manager' or request.user.is_superuser:
 			query = "select a.id as id, a.name as name, u.dob as dob,a.first_release_year as first_release_year, a.no_of_albums_releases as no_of_albums_releases, u.id as user_id, u.email as email, u.first_name as first_name, u.last_name as last_name, u.gender as gender, u.address as address, u.phone as phone from artist a join user u on a.user_id=u.id;"
 			cursor = connection.cursor()
 			cursor.execute(query)
@@ -106,7 +106,7 @@ class GetSongList(APIView):
 
 	def get(self,request, pk):
 		artist = Artist.objects.get(id=pk)
-		if request.user.role_type == 'super admin' or request.user.role_type == 'artist manager':
+		if request.user.role_type == 'super admin' or request.user.role_type == 'artist manager' or request.user.is_superuser:
 			
 			query = 'select * from music where artist_id ='+str(pk)+';'
 			cursor = connection.cursor()
