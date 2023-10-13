@@ -133,7 +133,6 @@ export default {
             localStorage.removeItem('token')
             this.errorMsg = '';
             const {valid}  = await this.$refs.form.validate();
-            console.log(valid);
             if (!valid) {
                 return;   
             }

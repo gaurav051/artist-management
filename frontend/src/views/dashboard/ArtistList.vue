@@ -412,7 +412,6 @@ export default {
       async initialize () {
 
         await axios.get('api/get/artist/list/').then(response=>{
-            console.log(response.data.data);
             this.UserData = response.data.data
         }).catch(error=>{
             console.log(error)
@@ -439,7 +438,6 @@ export default {
       },
       deleteItemConfirm () {
         var data = {id:this.editedItem.id} 
-        console.log(data)
         axios.post('/api/delete/artist/', data).then(response=>{
                 bulmaToast.toast({ message: 'Artist successfully deleted',  type: 'is-success',position: 'bottom-right' })
                 this.UserData.splice(this.editedIndex, 1)
@@ -549,7 +547,6 @@ export default {
       async save () {
         if (this.editedIndex > -1) {
             const {valid}  = await this.$refs.form.validate();
-            console.log(valid);
             if (!valid) {
                 return;
                 // this.initialize();

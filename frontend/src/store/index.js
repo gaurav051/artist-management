@@ -12,7 +12,6 @@ export default createStore({
       return state.isAuthenticated
     },
      getCurrentUser: (state)=>{
-      console.log(state.user);
       return state.user
     },
 
