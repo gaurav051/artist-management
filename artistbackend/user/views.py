@@ -64,8 +64,12 @@ class UserView(APIView):
 	authentication_classes = [JSONWebTokenAuthentication]
 	##
 	def get(self, request):
-		serializer = UserSerializer(request.user)
-		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+		cursor = connection.cursor()
+		cursor.execute("select id, email, role_type, first_name, last_name, phone, dob,gender,address, is_superuser from user where id=%s",[str(request.user.id),])
+		data = dictfetchall(cursor)
+		
+		# serializer = UserSerializer(request.user)
+		return Response({'user': data[0]}, status=status.HTTP_200_OK)
 
 
 class LogoutAllView(APIView):

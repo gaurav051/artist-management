@@ -18,14 +18,14 @@
           
             Music
           </v-btn>
-          <v-btn v-if="(getCurrentUser.role_type == 'super admin' || getCurrentUser.role_type == 'artist manager') && getIsAuthenticated"
+          <v-btn v-if="(getCurrentUser.role_type == 'super admin' || getCurrentUser.role_type == 'artist manager' || getCurrentUser.is_superuser) && getIsAuthenticated"
             flat
           
             :to="'/artist'">
            
             Artist
           </v-btn>
-          <v-btn v-if="getCurrentUser.role_type == 'super admin' && getIsAuthenticated"
+          <v-btn v-if="(getCurrentUser.role_type == 'super admin' || getCurrentUser.is_superuser)  && getIsAuthenticated"
             flat
           
             :to="'/users'">
